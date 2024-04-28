@@ -2,8 +2,38 @@ import HeaderGeneric from "@/src/components/commom/headerGeneric";
 import styles from "../styles/registerLogin.module.scss";
 import Head from "next/head";
 import { Form, FormGroup, Label, Container, Button, Input } from "reactstrap";
+import { FormEvent } from "react";
+import authService from "@/src/services/authService";
 
 const Register = () => {
+  const handleRegister = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const formData = new FormData(event.currentTarget);
+    const firstName = formData.get("firstName")!.toString();
+    const lastName = formData.get("lastName")!.toString();
+    const phone = formData.get("phone")!.toString();
+    const birth = formData.get("birth")!.toString();
+    const email = formData.get("email")!.toString();
+    const password = formData.get("password")!.toString();
+    const confirmPassword = formData.get("confirmPassword")!.toString();
+
+    const params = { firstName, lastName, phone, birth, email, password };
+
+    if (password != confirmPassword) {
+      alert("The passwords must be the same!");
+      return;
+    }
+
+    const { data, status} = await authService.register(params);
+
+    if (status === 201) {
+      alert("User successfully created!");
+    } else {
+      alert(data.message);
+    }
+  };
+
   return (
     <>
       <Head>
@@ -17,7 +47,7 @@ const Register = () => {
           <p className={styles.formTitle}>
             <strong>Welcome to Onebitflix</strong>
           </p>
-          <Form className={styles.form}>
+          <Form className={styles.form} onSubmit={handleRegister}>
             <p className="text-center">
               <strong>Faça a sua conta</strong>
             </p>
@@ -35,6 +65,7 @@ const Register = () => {
                 className={styles.inputName}
               />
             </FormGroup>
+
             <FormGroup>
               <Label for="lastName" className={styles.label}>
                 Sobrenome
@@ -49,6 +80,7 @@ const Register = () => {
                 className={styles.inputName}
               />
             </FormGroup>
+
             <FormGroup>
               <Label for="phone" className={styles.label}>
                 Whatapp
@@ -63,6 +95,7 @@ const Register = () => {
                 className={styles.input}
               />
             </FormGroup>
+
             <FormGroup>
               <Label for="email" className={styles.label}>
                 Email
@@ -76,6 +109,7 @@ const Register = () => {
                 className={styles.input}
               />
             </FormGroup>
+
             <FormGroup>
               <Label for="birth" className={styles.label}>
                 Nascimento
@@ -91,6 +125,7 @@ const Register = () => {
                 className={styles.input}
               />
             </FormGroup>
+
             <FormGroup>
               <Label for="password" className={styles.label}>
                 Senha
@@ -106,13 +141,14 @@ const Register = () => {
                 className={styles.input}
               />
             </FormGroup>
+
             <FormGroup>
-              <Label for="password" className={styles.label}>
+              <Label for="confirmPassword" className={styles.label}>
                 Confirme sua senha
               </Label>
               <Input
-                id="password"
-                name="password"
+                id="confirmPassword"
+                name="confirmPassword"
                 type="password"
                 placeholder="Confirme sua senha"
                 minLength={6}
@@ -121,6 +157,10 @@ const Register = () => {
                 className={styles.input}
               />
             </FormGroup>
+
+            <Button type="submit" outline className={styles.formBtn}>
+              CADASTRAR
+            </Button>
           </Form>
         </Container>
       </main>
