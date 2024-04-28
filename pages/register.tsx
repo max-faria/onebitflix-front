@@ -1,11 +1,18 @@
-import HeaderGeneric from "@/src/components/commom/headerGeneric";
+import HeaderGeneric from "@/src/components/common/headerGeneric";
 import styles from "../styles/registerLogin.module.scss";
 import Head from "next/head";
 import { Form, FormGroup, Label, Container, Button, Input } from "reactstrap";
-import { FormEvent } from "react";
+import { FormEvent, useState } from "react";
 import authService from "@/src/services/authService";
+import { useRouter } from "next/router";
+import ToastComponent from "@/src/components/common/toast";
 
 const Register = () => {
+  const [toastIsOpen, setToastIsOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+
+  const router = useRouter();
+
   const handleRegister = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -21,16 +28,26 @@ const Register = () => {
     const params = { firstName, lastName, phone, birth, email, password };
 
     if (password != confirmPassword) {
-      alert("The passwords must be the same!");
+      // alert("The passwords must be the same!");
+      setToastIsOpen(true);
+      setTimeout(() => {
+        setToastIsOpen(false);
+      }, 1000 * 3);
+      setToastMessage("The passwords must be the same!");
+
       return;
     }
 
-    const { data, status} = await authService.register(params);
+    const { data, status } = await authService.register(params);
 
     if (status === 201) {
-      alert("User successfully created!");
+      router.push("/login?registered=true");
     } else {
-      alert(data.message);
+      setToastIsOpen(true);
+      setTimeout(() => {
+        setToastIsOpen(false);
+      }, 1000 * 3);
+      setToastMessage(data.message);
     }
   };
 
@@ -38,6 +55,7 @@ const Register = () => {
     <>
       <Head>
         <title>Onebitflix Register</title>
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
         <script src="https://jsuites.net/v4/jsuites.js"></script>
       </Head>
       <main className={styles.main}>
@@ -163,6 +181,12 @@ const Register = () => {
             </Button>
           </Form>
         </Container>
+
+        <ToastComponent
+          color="bg-danger"
+          isOpen={toastIsOpen}
+          message={toastMessage}
+        />
       </main>
     </>
   );
