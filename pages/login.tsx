@@ -2,9 +2,32 @@ import Head from "next/head";
 import HeaderGeneric from "../src/components/commom/headerGeneric";
 import styles from "../styles/registerLogin.module.scss";
 import { Form, FormGroup, Label, Container, Button, Input } from "reactstrap";
+import { useRouter } from "next/router";
+import { FormEvent, useEffect, useState } from "react";
+import authService from "@/src/services/authService";
 
 
-const Login = function () {
+const Login = () => {
+    const router = useRouter()
+
+    const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault()
+
+        const formData = new FormData(event.currentTarget)
+        const email = formData.get("email")!.toString()
+        const password = formData.get("password")!.toString()
+        const params = {email, password}
+
+        const {status} = await authService.login(params)
+
+        if(status === 200) {
+            router.push("/home")
+        } else {
+            alert("Email ou senha incorretos!")
+        }
+    }
+
+
   return (
     <>
       <Head>
@@ -16,7 +39,7 @@ const Login = function () {
 
         <Container className="py-5">
 	<p className={styles.formTitle}>Bem-vindo(a) ao OneBitFlix!</p>
-	<Form className={styles.form}>
+	<Form className={styles.form} onSubmit={handleLogin}>
 	  <p className="text-center">
 	    <strong>Bem-vindo(a) ao OneBitFlix!</strong>
     </p>
