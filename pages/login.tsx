@@ -3,7 +3,7 @@ import HeaderGeneric from "../src/components/common/headerGeneric";
 import styles from "../styles/registerLogin.module.scss";
 import { Form, FormGroup, Label, Container, Button, Input } from "reactstrap";
 import { useRouter } from "next/router";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, use, useEffect, useState } from "react";
 import authService from "@/src/services/authService";
 import ToastComponent from "@/src/components/common/toast";
 
@@ -12,6 +12,12 @@ const Login = () => {
   const [toastIsOpen, setToastIsOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
 
+  useEffect(() => {
+    if(sessionStorage.getItem("onebitflix-token")){
+      router.push("/home")
+    }
+  },[])
+
   const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -19,6 +25,7 @@ const Login = () => {
     const email = formData.get("email")!.toString();
     const password = formData.get("password")!.toString();
     const params = { email, password };
+
 
     const { status } = await authService.login(params);
 
@@ -87,7 +94,6 @@ const Login = () => {
         color="bg-danger"
         isOpen={toastIsOpen}
         message={toastMessage}
-        
         />
       </main>
     </>
